@@ -1,0 +1,25 @@
+{
+  "name": "vizion-status-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streleck/vizion-status-checker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/streleck/vizion-status-checker/issues"
+  },
+  "homepage": "https://github.com/streleck/vizion-status-checker#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
+    "axios": "^0.18.0",
+    "https": "^1.0.0",
+    "nodemailer": "^4.7.0"
+  }
+}
