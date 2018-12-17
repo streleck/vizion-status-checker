@@ -8,7 +8,7 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
-let isAppUp = true;
+let isAppUp = false;
 let appEmailLastSentAt = 0;
 let isApp3Up = true;
 let app3EmailLastSentAt = 0;
@@ -16,6 +16,14 @@ let app3EmailLastSentAt = 0;
 const appUrl = 'https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai';
 const app3Url = '';
 const emailsSendTo = 'markstrelecky@yandex.com';
+
+const msg = {
+  to: emailsSendTo,
+  from: 'streleck@gmail.com',
+  subject: 'app.vizion.ai is back up',
+  text: 'Elasticsearch url: ' + 'appUrl',
+};
+sgMail.send(msg);
 
 if(appUrl){
   setInterval(function(){
