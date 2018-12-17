@@ -27,6 +27,7 @@ if(appUrl){
       httpsAgent: agent 
     })
       .then(function(response) {
+        console.log('App Success');
         if(!isAppUp){
           const msg = {
             to: emailsSendTo,
@@ -39,6 +40,7 @@ if(appUrl){
         isAppUp = true;
       })
       .catch(function(error) {
+        console.log('App fail!!!!! \n', error);
         let timeElapsedSinceLastEmail = Date.now() - appEmailLastSentAt;
         if(isAppUp){
           const msg = {
@@ -76,6 +78,7 @@ if(app3Url){
       httpsAgent: agent 
     })
       .then(function(response) {
+        console.log('App3 success');
         if(!isApp3Up){
           const msg = {
             to: emailsSendTo,
@@ -88,6 +91,7 @@ if(app3Url){
         isApp3Up = true;
       })
       .catch(function(error) {
+        console.log('App3 fail!!!!! \n', error);
         let timeElapsedSinceLastEmail = Date.now() - app3EmailLastSentAt;
         if(isApp3Up){
           const msg = {
