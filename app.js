@@ -10,11 +10,11 @@ const agent = new https.Agent({
 
 let isAppUp = false;
 let appEmailLastSentAt = 0;
-let isApp3Up = true;
+let isApp3Up = false;
 let app3EmailLastSentAt = 0;
 
 const appUrl = 'https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai';
-const app3Url = '';
+const app3Url = 'https://2e967f17d9c64cbe:adc45891cdf82512@cjpsnybuk000f01iu3daq9js6.es3.vizion.ai';
 const emailsSendTo = 'markstrelecky@yandex.com';
 
 const msg = {
