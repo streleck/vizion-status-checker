@@ -10,11 +10,11 @@ const agent = new https.Agent({
 
 let appStatus = {};
 
-const appUrls = ['https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai', 'https://2e967f17d9c64cbe:adc45891cdf82512@cjpsnybuk000f01iu3daq9js6.es3.vizion.ai']
+const appUrls = ['https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai', 'https://756cb86dcfb84d1c:b50092274154d074@cjpsoknpt000g01iuarykmrln.es3.vizion.ai'];
 const emailsSendTo = 'markstrelecky@yandex.com';
 
-
 for (let appUrl of appUrls){
+  appStatus[appUrl] = {post: false, get: false};
   // Set up an initial 'put' to test later for data fidelity
   axios({
     method:'put',
@@ -25,8 +25,9 @@ for (let appUrl of appUrls){
   })
   // If successful, start a testing interval on that url
   .then(function(response) {
-    appStatus[appUrl]['post'] = true;
-    appstatus[appUrl]['get'] = true;
+    appStatus[appUrl].post = true;
+    appStatus[appUrl].get = true;
+    console.log(appStatus[appUrl]);
     let msg = {
       to: emailsSendTo,
       from: 'streleck@gmail.com',
@@ -35,7 +36,7 @@ for (let appUrl of appUrls){
     };
     sgMail.send(msg);
     setInterval(function(){
-
+      console.log('huh?');
       // Post test
       axios({
         method:'post',
@@ -116,6 +117,7 @@ for (let appUrl of appUrls){
   })
   // Initial put has failed, email about the failure
   .catch(function(error) {
+    //console.log('initial fail ', error);
     let msg = {
       to: emailsSendTo,
       from: 'streleck@gmail.com',
