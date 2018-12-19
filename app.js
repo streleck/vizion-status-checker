@@ -44,7 +44,7 @@ for (let appUrl of appUrls){
         httpsAgent: agent 
       })
       .then(function(response) {
-        console.log('App Success');
+        console.log('POST Success');
         if(!appStatus[appUrl]['post']){
           let msg = {
             to: emailsSendTo,
@@ -57,7 +57,8 @@ for (let appUrl of appUrls){
         appStatus[appUrl]['post'] = true;
       })
       .catch(function(error) {
-        console.log('App fail!!!!! \n', error);
+        //console.log('POST fail!!!!! \n', error);
+        console.log('POST fail!');
         let msg = {
           to: emailsSendTo,
           from: 'streleck@gmail.com',
@@ -101,7 +102,8 @@ for (let appUrl of appUrls){
         }
       })
       .catch(function(error) {
-        console.log('get fail!!!! ', error);
+        //console.log('get fail!!!! ', error);
+        console.log('GET fail');
         let msg = {
           to: emailsSendTo,
           from: 'streleck@gmail.com',
@@ -109,14 +111,15 @@ for (let appUrl of appUrls){
           text: 'Elasticsearch url: ' + appUrl,
         };
         sgMail.send(msg);
-        appStatus[appUrl]['post'] = false;
+        appStatus[appUrl]['get'] = false;
       })
 
     }, (1000 * 60 * 5));
   })
   // Initial put has failed, email about the failure
   .catch(function(error) {
-    console.log('initial fail ', error);
+    //console.log('initial fail ', error);
+    console.log('initial fail');
     let msg = {
       to: emailsSendTo,
       from: 'streleck@gmail.com',
