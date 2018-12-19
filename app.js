@@ -16,6 +16,7 @@ const emailsSendTo = 'markstrelecky@yandex.com';
 for (let appUrl of appUrls){
   appStatus[appUrl] = {post: false, get: false};
   // Set up an initial 'put' to test later for data fidelity
+  console.log('looping');
   axios({
     method:'put',
     url: appUrl + '/tests/_doc/1',
@@ -27,13 +28,13 @@ for (let appUrl of appUrls){
   .then(function(response) {
     appStatus[appUrl].post = true;
     appStatus[appUrl].get = true;
-    let msg = {
-      to: emailsSendTo,
-      from: 'streleck@gmail.com',
-      subject: 'Your vizion.ai ES app is being tested',
-      text: 'Elasticsearch url: ' + appUrl + '\n \n This app has successfully recieved an initial PUT and will now be tested every five minutes.',
-    };
-    sgMail.send(msg);
+    // let msg = {
+    //   to: emailsSendTo,
+    //   from: 'streleck@gmail.com',
+    //   subject: 'Your vizion.ai ES app is being tested',
+    //   text: 'Elasticsearch url: ' + appUrl + '\n \n This app has successfully recieved an initial PUT and will now be tested every five minutes.',
+    // };
+    // sgMail.send(msg);
     setInterval(function(){
       // Post test
       axios({
