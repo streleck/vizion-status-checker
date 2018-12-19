@@ -8,122 +8,137 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
-let isAppUp = false;
-let appEmailLastSentAt = 0;
-let isApp3Up = false;
-let app3EmailLastSentAt = 0;
+let appStatus = {};
 
-const appUrl = 'https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai';
-const app3Url = 'https://2e967f17d9c64cbe:adc45891cdf82512@cjpsnybuk000f01iu3daq9js6.es3.vizion.ai';
+const appUrls = ['https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai', 'https://2e967f17d9c64cbe:adc45891cdf82512@cjpsnybuk000f01iu3daq9js6.es3.vizion.ai']
 const emailsSendTo = 'markstrelecky@yandex.com';
 
-const msg = {
-  to: emailsSendTo,
-  from: 'streleck@gmail.com',
-  subject: 'app.vizion.ai is back up',
-  text: 'Elasticsearch url: ' + 'appUrl',
-};
-sgMail.send(msg);
+axios({
+  method:'get',
+  url: 'https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai' + '/tests/_doc/1',
+  data: {"fidelityTest": "ChesapeakeScooter"},
+  headers: {'Content-Type':'application/json'},
+  httpsAgent: agent 
+})
+.then(function(response) {
+  // Read data to see if it has maintained fidelity
+  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%', response.data._source.fidelityTest);
+})
+.catch(function(error) {
+  console.log('*******************************************************************', error);
+})
 
-if(appUrl){
-  setInterval(function(){
-    axios({
-      method:'post',
-      url: appUrl + '/tests/_doc',
-      data: {"datapoint": "test"},
-      headers: {'Content-Type':'application/json'},
-      httpsAgent: agent 
-    })
+
+
+for (let appUrl of appUrls){
+  // Set up an initial 'put' to test later for data fidelity
+  axios({
+    method:'put',
+    url: appUrl + '/tests/_doc/1',
+    data: {"fidelityTest": "ChesapeakeScooter"},
+    headers: {'Content-Type':'application/json'},
+    httpsAgent: agent 
+  })
+  // If successful, start a testing interval on that url
+  .then(function(response) {
+    appStatus[appUrl]['post'] = true;
+    appstatus[appUrl]['get'] = true;
+    let msg = {
+      to: emailsSendTo,
+      from: 'streleck@gmail.com',
+      subject: 'Your vizion.ai ES app is being tested',
+      text: 'Elasticsearch url: ' + appUrl + '\n \n This app has successfully recieved an initial PUT and will now be tested every five minutes.',
+    };
+    sgMail.send(msg);
+    setInterval(function(){
+
+      // Post test
+      axios({
+        method:'post',
+        url: appUrl + '/tests/_doc',
+        data: {"datapoint": "test"},
+        headers: {'Content-Type':'application/json'},
+        httpsAgent: agent 
+      })
       .then(function(response) {
         console.log('App Success');
-        if(!isAppUp){
-          const msg = {
+        if(!appStatus[appUrl]['post']){
+          let msg = {
             to: emailsSendTo,
             from: 'streleck@gmail.com',
-            subject: 'app.vizion.ai is back up',
-            text: 'Elasticsearch url: ' + appUrl,
+            subject: 'Your vizion.ai ES app is functioning for POST',
+            text: 'Elasticsearch url: ' + appUrl + '\n \n After having previously failed a POST attempt, this app has now successfully accepted a POST.',
           };
           sgMail.send(msg);
         }
-        isAppUp = true;
+        appStatus[appUrl]['post'] = true;
       })
       .catch(function(error) {
         console.log('App fail!!!!! \n', error);
-        let timeElapsedSinceLastEmail = Date.now() - appEmailLastSentAt;
-        if(isAppUp){
-          const msg = {
-            to: emailsSendTo,
-            from: 'streleck@gmail.com',
-            subject: 'app.vizion.ai has gone down',
-            text: 'Elasticsearch url: ' + appUrl,
-          };
-          sgMail.send(msg);
-          appEmailLastSentAt = Date.now();
-        }
-        else if(timeElapsedSinceLastEmail > (1000 * 60 * 60)){
-          const msg = {
-            to: emailsSendTo,
-            from: 'streleck@gmail.com',
-            subject: 'app.vizion.ai is still down',
-            text: 'Elasticsearch url: ' + appUrl,
-          };
-          sgMail.send(msg);
-          appEmailLastSentAt = Date.now();
-        }
-        isAppUp = false;
-      } 
-    );
-  }, (1000 * 60 * 5));
-}
+        let msg = {
+          to: emailsSendTo,
+          from: 'streleck@gmail.com',
+          subject: 'Your vizion.ai ES app has failed a POST attempt',
+          text: 'Elasticsearch url: ' + appUrl,
+        };
+        sgMail.send(msg);
+        appStatus[appUrl]['post'] = false;
+      });
 
-if(app3Url){
-  setInterval(function(){
-    axios({
-      method:'post',
-      url: app3Url + '/tests/_doc',
-      data: {"datapoint": "test"},
-      headers: {'Content-Type':'application/json'},
-      httpsAgent: agent 
-    })
+      // GET test
+      axios({
+        method:'get',
+        url: appUrl + '/tests/_doc/1',
+        headers: {'Content-Type':'application/json'},
+        httpsAgent: agent 
+      })
       .then(function(response) {
-        console.log('App3 success');
-        if(!isApp3Up){
-          const msg = {
+        // Read data to see if it has maintained fidelity
+        if(response.data._source.fidelityTest !== "ChesapeakeScooter") {
+          let msg = {
             to: emailsSendTo,
             from: 'streleck@gmail.com',
-            subject: 'app3.vizion.ai is back up',
-            text: 'Elasticsearch url: ' + app3Url,
+            subject: 'Your vizion.ai ES app has failed a data fidelity check',
+            text: 'Elasticsearch url: ' + appUrl + '\n \n This app was successfully able to return data from a GET request, but that data did not match what was expected.',
           };
           sgMail.send(msg);
+          appStatus[appUrl]['get'] = false;
         }
-        isApp3Up = true;
+        else {
+          if(appStatus[appUrl]['get'] === false){
+            let msg = {
+              to: emailsSendTo,
+              from: 'streleck@gmail.com',
+              subject: 'Your vizion.ai ES app is functioning for GET',
+              text: 'Elasticsearch url: ' + appUrl + '\n \n After having previously failed a GET attempt, this app has now successfully accepted a GET and returned the expected data.',
+            };
+          }
+          sgMail.send(msg);
+          appStatus[appUrl]['get'] = true;
+        }
       })
       .catch(function(error) {
-        console.log('App3 fail!!!!! \n', error);
-        let timeElapsedSinceLastEmail = Date.now() - app3EmailLastSentAt;
-        if(isApp3Up){
-          const msg = {
-            to: emailsSendTo,
-            from: 'streleck@gmail.com',
-            subject: 'app3.vizion.ai has gone down',
-            text: 'Elasticsearch url: ' + app3Url,
-          };
-          sgMail.send(msg);
-          app3EmailLastSentAt = Date.now();
-        }
-        else if(timeElapsedSinceLastEmail > (1000 * 60 * 60)){
-          const msg = {
-            to: emailsSendTo,
-            from: 'streleck@gmail.com',
-            subject: 'app3.vizion.ai is still down',
-            text: 'Elasticsearch url: ' + app3Url,
-          };
-          sgMail.send(msg);
-          app3EmailLastSentAt = Date.now();
-        }
-        isApp3Up = false;
-      } 
-    );
-  }, (1000 * 60 * 5));
+        let msg = {
+          to: emailsSendTo,
+          from: 'streleck@gmail.com',
+          subject: 'Your vizion.ai ES app has failed a GET attempt',
+          text: 'Elasticsearch url: ' + appUrl,
+        };
+        sgMail.send(msg);
+        appStatus[appUrl]['post'] = false;
+      })
+
+    }, (1000 * 60 * 5));
+  })
+  // Initial put has failed, email about the failure
+  .catch(function(error) {
+    let msg = {
+      to: emailsSendTo,
+      from: 'streleck@gmail.com',
+      subject: 'Your vizion.ai ES app is not functioning.',
+      text: 'Elasticsearch url: ' + appUrl + '\n \n This app was not successful in an initial PUT test and will not continue to be tested.',
+    };
+  });
 }
+
 
