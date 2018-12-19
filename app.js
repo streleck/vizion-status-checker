@@ -13,22 +13,6 @@ let appStatus = {};
 const appUrls = ['https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai', 'https://2e967f17d9c64cbe:adc45891cdf82512@cjpsnybuk000f01iu3daq9js6.es3.vizion.ai']
 const emailsSendTo = 'markstrelecky@yandex.com';
 
-axios({
-  method:'get',
-  url: 'https://e33d2ea501994214:b4b699b082a2f685@cjpoeiifd000101m3i4tz8dm5.es.vizion.ai' + '/tests/_doc/1',
-  data: {"fidelityTest": "ChesapeakeScooter"},
-  headers: {'Content-Type':'application/json'},
-  httpsAgent: agent 
-})
-.then(function(response) {
-  // Read data to see if it has maintained fidelity
-  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%', response.data._source.fidelityTest);
-})
-.catch(function(error) {
-  console.log('*******************************************************************', error);
-})
-
-
 
 for (let appUrl of appUrls){
   // Set up an initial 'put' to test later for data fidelity
