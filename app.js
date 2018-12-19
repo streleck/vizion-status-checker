@@ -27,7 +27,6 @@ for (let appUrl of appUrls){
   .then(function(response) {
     appStatus[appUrl].post = true;
     appStatus[appUrl].get = true;
-    console.log(appStatus[appUrl]);
     let msg = {
       to: emailsSendTo,
       from: 'streleck@gmail.com',
@@ -36,7 +35,6 @@ for (let appUrl of appUrls){
     };
     sgMail.send(msg);
     setInterval(function(){
-      console.log('huh?');
       // Post test
       axios({
         method:'post',
@@ -103,6 +101,7 @@ for (let appUrl of appUrls){
         }
       })
       .catch(function(error) {
+        console.log('get fail!!!! ', error);
         let msg = {
           to: emailsSendTo,
           from: 'streleck@gmail.com',
@@ -117,7 +116,7 @@ for (let appUrl of appUrls){
   })
   // Initial put has failed, email about the failure
   .catch(function(error) {
-    //console.log('initial fail ', error);
+    console.log('initial fail ', error);
     let msg = {
       to: emailsSendTo,
       from: 'streleck@gmail.com',
